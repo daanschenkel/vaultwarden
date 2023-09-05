@@ -26,7 +26,9 @@ Then you can access :
  - `VaultWarden` on http://127.0.0.1:8000 with the default user `test@yopmail.com/test`.
  - `Keycloak` on http://127.0.0.1:8080/admin/master/console/ with the default user `admin/admin`
 
-To procede with an SSO login after you enter the email, on the screen prompting for `Master Password` the sso button should be visible.
+## Switching VaultWarden front-end
+
+You can switch between both [version](https://github.com/Timshel/oidc_web_builds) of the front-end using the env variable `SSO_FRONTEND` with `button` or `override` (default is `button`).
 
 ## Running only Keycloak
 
@@ -41,6 +43,8 @@ When running with a local VaultWarden you'll need to make the sso button visible
 ```bash
 sed -i 's#a\[routerlink="/sso"\],##' /web-vault/app/main.*.css
 ```
+
+Or use one of the prebuilt front-end from [timshel/oidc_web_builds](https://github.com/Timshel/oidc_web_builds/releases).
 
 Otherwise you'll need to reveal the SSO login button using the debug console (F12)
 

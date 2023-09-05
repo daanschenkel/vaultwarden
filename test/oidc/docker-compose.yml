@@ -27,5 +27,3 @@ services:
     depends_on:
       - keycloak
     env_file: .env
-    volumes:
-      - ./vaultwarden.sh:/etc/vaultwarden.sh

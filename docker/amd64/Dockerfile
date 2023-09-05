@@ -5,28 +5,17 @@
 # Using multistage build:
 # 	https://docs.docker.com/develop/develop-images/multistage-build/
 # 	https://whitfin.io/speeding-up-rust-docker-builds/
-####################### VAULT BUILD IMAGE  #######################
-# The web-vault digest specifies a particular web-vault build on Docker Hub.
-# Using the digest instead of the tag name provides better security,
-# as the digest of an image is immutable, whereas a tag name can later
-# be changed to point to a malicious image.
-#
-# To verify the current digest for a given tag name:
-# - From https://hub.docker.com/r/vaultwarden/web-vault/tags,
-#   click the tag name to view the digest of the image it currently points to.
-# - From the command line:
-#     $ docker pull docker.io/vaultwarden/web-vault:v2023.8.2
-#     $ docker image inspect --format "{{.RepoDigests}}" docker.io/vaultwarden/web-vault:v2023.8.2
-#     [docker.io/vaultwarden/web-vault@sha256:b361e79309ef2c4368f880f350166daade41eb0927a9adf376c76e3713027252]
-#
-# - Conversely, to get the tag name from the digest:
-#     $ docker image inspect --format "{{.RepoTags}}" docker.io/vaultwarden/web-vault@sha256:b361e79309ef2c4368f880f350166daade41eb0927a9adf376c76e3713027252
-#     [docker.io/vaultwarden/web-vault:v2023.8.2]
-#
-FROM docker.io/vaultwarden/web-vault@sha256:b361e79309ef2c4368f880f350166daade41eb0927a9adf376c76e3713027252 as vault
 
 ########################## BUILD IMAGE  ##########################
 FROM docker.io/library/rust:1.72.0-bookworm as build
+
+# Get both version of the front-end
+RUN wget -c https://github.com/Timshel/oidc_web_builds/releases/latest/download/oidc_button_web_vault.tar.gz -O - \
+    | tar -xz \
+    ; mv web-vault web-vault_button
+RUN wget -c https://github.com/Timshel/oidc_web_builds/releases/latest/download/oidc_override_web_vault.tar.gz -O - \
+    | tar -xz \
+    ; mv web-vault web-vault_override
 
 # Build time options to avoid dpkg warnings and help with reproducible builds.
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -108,7 +97,8 @@ EXPOSE 3012
 # Copies the files from the context (Rocket.toml file and web-vault)
 # and the binary from the "build" stage to the current stage
 WORKDIR /
-COPY --from=vault /web-vault ./web-vault
+COPY --from=build /web-vault_button ./web-vault_button
+COPY --from=build /web-vault_override ./web-vault_override
 COPY --from=build /app/target/release/vaultwarden .
 
 COPY docker/healthcheck.sh /healthcheck.sh
