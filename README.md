@@ -54,3 +54,4 @@ DROP TABLE
 ```
 
 Then the new migration will play without issue.
+.
