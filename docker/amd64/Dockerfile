@@ -90,7 +90,6 @@ RUN mkdir /data \
     && rm -rf /var/lib/apt/lists/*
 
 
-VOLUME /data
 EXPOSE 80
 EXPOSE 3012
 
